@@ -1,59 +1,61 @@
 import React, { useState } from 'react';
 import './login.css';
+import Dashboard from '../dashboard/dasboard.js';
+import Usuario from '../usuario/usuario.js';
 
-// Componente de Dashboard para Trabajadores
-const WorkerDashboard = ({ user, onLogout }) => (
-  <div className="dashboard-container worker-dashboard">
-    <div className="dashboard-content">
-      <div className="dashboard-card">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">Panel de Trabajador</h1>
-          <button
-            onClick={onLogout}
-            className="logout-button"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-        <div className="welcome-section worker-welcome">
-          <h2 className="welcome-title">
-            Bienvenido, {user.username}
-          </h2>
-          <p className="welcome-description">
-            Acceso de trabajador - Funcionalidades limitadas disponibles
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+// Componente de Dashboard para Trabajadores (temporal)
+// const Dashboard = ({ user, onLogout }) => (
+//   <div className="dashboard-container worker-dashboard">
+//     <div className="dashboard-content">
+//       <div className="dashboard-card">
+//         <div className="dashboard-header">
+//           <h1 className="dashboard-title">Dashboard de Trabajador</h1>
+//           <button
+//             onClick={onLogout}
+//             className="logout-button"
+//           >
+//             Cerrar Sesión
+//           </button>
+//         </div>
+//         <div className="welcome-section worker-welcome">
+//           <h2 className="welcome-title">
+//             Bienvenido, {user.username}
+//           </h2>
+//           <p className="welcome-description">
+//             Panel de trabajador - Reemplaza este componente con tu archivo dashboard.js
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+// );
 
-// Componente de Dashboard para Administradores
-const AdminDashboard = ({ user, onLogout }) => (
-  <div className="dashboard-container admin-dashboard">
-    <div className="dashboard-content">
-      <div className="dashboard-card">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">Panel de Administrador</h1>
-          <button
-            onClick={onLogout}
-            className="logout-button"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-        <div className="welcome-section admin-welcome">
-          <h2 className="welcome-title">
-            Bienvenido, {user.username}
-          </h2>
-          <p className="welcome-description">
-            Acceso de administrador - Todas las funcionalidades disponibles
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+// Componente de Usuario para Administradores (temporal)
+// const Usuario = ({ user, onLogout }) => (
+//   <div className="dashboard-container admin-dashboard">
+//     <div className="dashboard-content">
+//       <div className="dashboard-card">
+//         <div className="dashboard-header">
+//           <h1 className="dashboard-title">Panel de Usuario/Administrador</h1>
+//           <button
+//             onClick={onLogout}
+//             className="logout-button"
+//           >
+//             Cerrar Sesión
+//           </button>
+//         </div>
+//         <div className="welcome-section admin-welcome">
+//           <h2 className="welcome-title">
+//             Bienvenido, {user.username}
+//           </h2>
+//           <p className="welcome-description">
+//             Panel de administrador - Reemplaza este componente con tu archivo usuario.js
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+// );
 
 // Componente principal de Login
 const LoginComponent = ({ onLogin }) => {
@@ -162,11 +164,11 @@ const LoginComponent = ({ onLogin }) => {
         </div>
 
         {/* Información de usuarios de prueba */}
-        <div className="test-users-info">
+        {/* <div className="test-users-info">
           <p className="test-users-title">Usuarios de prueba:</p>
           <p><strong>Trabajador:</strong> trabajador01 / worker123</p>
           <p><strong>Admin:</strong> admin01 / admin456</p>
-        </div>
+        </div> */}
 
         <div className="login-form">
           {/* Selector de tipo de usuario */}
@@ -263,7 +265,7 @@ const LoginComponent = ({ onLogin }) => {
 };
 
 // Componente principal que maneja el estado de autenticación
-const App = () => {
+const Login = () => {
   const [user, setUser] = useState(null);
 
   const handleLogin = (userData) => {
@@ -281,10 +283,10 @@ const App = () => {
 
   // Redireccionar según el tipo de usuario
   if (user.type === 'admin') {
-    return <AdminDashboard user={user} onLogout={handleLogout} />;
+    return <Usuario user={user} onLogout={handleLogout} />;
   } else {
-    return <WorkerDashboard user={user} onLogout={handleLogout} />;
+    return <Dashboard user={user} onLogout={handleLogout} />;
   }
 };
 
-export default App;
+export default Login;
