@@ -1,292 +1,272 @@
 import React, { useState } from 'react';
-import './login.css';
-import Dashboard from '../dashboard/dasboard.js';
-import Usuario from '../usuario/usuario.js';
+import { User, Shield, Lock, Mail } from 'lucide-react';
 
-// Componente de Dashboard para Trabajadores (temporal)
-// const Dashboard = ({ user, onLogout }) => (
-//   <div className="dashboard-container worker-dashboard">
-//     <div className="dashboard-content">
-//       <div className="dashboard-card">
-//         <div className="dashboard-header">
-//           <h1 className="dashboard-title">Dashboard de Trabajador</h1>
-//           <button
-//             onClick={onLogout}
-//             className="logout-button"
-//           >
-//             Cerrar Sesión
-//           </button>
-//         </div>
-//         <div className="welcome-section worker-welcome">
-//           <h2 className="welcome-title">
-//             Bienvenido, {user.username}
-//           </h2>
-//           <p className="welcome-description">
-//             Panel de trabajador - Reemplaza este componente con tu archivo dashboard.js
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// );
+// CSS en línea como objeto para mantener todo en un archivo
+const styles = {
+  container: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: 'Arial, sans-serif',
+    padding: '20px'
+  },
+  loginCard: {
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: '20px',
+    padding: '40px',
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '400px',
+    textAlign: 'center'
+  },
+  title: {
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '10px'
+  },
+  subtitle: {
+    color: '#666',
+    marginBottom: '40px',
+    fontSize: '1.1rem'
+  },
+  userTypeContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    marginBottom: '30px'
+  },
+  userTypeButton: {
+    padding: '20px',
+    border: '2px solid #e0e0e0',
+    borderRadius: '15px',
+    background: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '15px',
+    fontSize: '1.1rem',
+    fontWeight: '500'
+  },
+  userTypeButtonActive: {
+    borderColor: '#667eea',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    color: 'white',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 10px 20px rgba(102, 126, 234, 0.3)'
+  },
+  formGroup: {
+    textAlign: 'left',
+    marginBottom: '20px'
+  },
+  label: {
+    display: 'block',
+    marginBottom: '8px',
+    color: '#333',
+    fontWeight: '500'
+  },
+  input: {
+    width: '100%',
+    padding: '15px',
+    border: '2px solid #e0e0e0',
+    borderRadius: '10px',
+    fontSize: '1rem',
+    transition: 'border-color 0.3s ease',
+    boxSizing: 'border-box'
+  },
+  inputFocus: {
+    borderColor: '#667eea',
+    outline: 'none'
+  },
+  loginButton: {
+    width: '100%',
+    padding: '15px',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease',
+    marginTop: '10px'
+  },
+  loginButtonHover: {
+    transform: 'translateY(-2px)'
+  },
+  errorMessage: {
+    color: '#e74c3c',
+    fontSize: '0.9rem',
+    marginTop: '10px',
+    textAlign: 'center'
+  }
+};
 
-// Componente de Usuario para Administradores (temporal)
-// const Usuario = ({ user, onLogout }) => (
-//   <div className="dashboard-container admin-dashboard">
-//     <div className="dashboard-content">
-//       <div className="dashboard-card">
-//         <div className="dashboard-header">
-//           <h1 className="dashboard-title">Panel de Usuario/Administrador</h1>
-//           <button
-//             onClick={onLogout}
-//             className="logout-button"
-//           >
-//             Cerrar Sesión
-//           </button>
-//         </div>
-//         <div className="welcome-section admin-welcome">
-//           <h2 className="welcome-title">
-//             Bienvenido, {user.username}
-//           </h2>
-//           <p className="welcome-description">
-//             Panel de administrador - Reemplaza este componente con tu archivo usuario.js
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// );
-
-// Componente principal de Login
-const LoginComponent = ({ onLogin }) => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    userType: 'worker'
+const Login = ({ onNavigate }) => {
+  const [selectedUserType, setSelectedUserType] = useState('');
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: ''
   });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [focusedInput, setFocusedInput] = useState('');
 
-  // Usuarios predefinidos
-  const users = {
-    worker: {
-      username: 'trabajador01',
-      password: 'worker123',
-      type: 'worker'
-    },
-    admin: {
-      username: 'admin01',
-      password: 'admin456',
-      type: 'admin'
-    }
+  const handleUserTypeSelect = (type) => {
+    setSelectedUserType(type);
+    setError('');
   };
 
-  // Validaciones
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.username.trim()) {
-      newErrors.username = 'El nombre de usuario es requerido';
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'El nombre de usuario debe tener al menos 3 caracteres';
-    }
-
-    if (!formData.password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Manejar cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setCredentials(prev => ({
       ...prev,
       [name]: value
     }));
-
-    // Limpiar error específico cuando el usuario empiece a escribir
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setError('');
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = async () => {
-    if (!validateForm()) {
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    if (!selectedUserType) {
+      setError('Por favor selecciona un tipo de usuario');
       return;
     }
 
-    setIsSubmitting(true);
+    if (!credentials.email || !credentials.password) {
+      setError('Por favor completa todos los campos');
+      return;
+    }
 
-    // Simular delay de autenticación
-    setTimeout(() => {
-      const targetUser = users[formData.userType];
+    // Validación simple de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(credentials.email)) {
+      setError('Por favor ingresa un email válido');
+      return;
+    }
+
+    // Aquí puedes agregar la lógica de autenticación
+    // Por ahora, solo validamos que los campos estén completos
+
+    if (selectedUserType === 'trabajador') {
+      // Guardar información del usuario en localStorage
+      localStorage.setItem('userType', 'trabajador');
+      localStorage.setItem('userEmail', credentials.email);
       
-      if (formData.username === targetUser.username && 
-          formData.password === targetUser.password) {
-        // Login exitoso
-        onLogin({
-          username: targetUser.username,
-          type: targetUser.type
-        });
-      } else {
-        // Login fallido
-        setErrors({
-          general: 'Credenciales incorrectas. Verifica tu usuario y contraseña.'
-        });
+      // Redirigir al formulario (componente 2)
+      if (onNavigate) {
+        onNavigate('formulario');
       }
+    } else if (selectedUserType === 'administrador') {
+      // Guardar información del usuario en localStorage
+      localStorage.setItem('userType', 'administrador');
+      localStorage.setItem('userEmail', credentials.email);
       
-      setIsSubmitting(false);
-    }, 1000);
-  };
-
-  // Manejar Enter en los campos
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
+      // Redirigir al dashboard (componente 3)
+      if (onNavigate) {
+        onNavigate('dashboard');
+      }
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h2 className="login-title">Iniciar Sesión</h2>
-          <p className="login-subtitle">Accede a tu cuenta</p>
+    <div style={styles.container}>
+      <div style={styles.loginCard}>
+        <h1 style={styles.title}>Bienvenido</h1>
+        <p style={styles.subtitle}>Selecciona tu tipo de usuario</p>
+        
+        <div style={styles.userTypeContainer}>
+          <div
+            style={{
+              ...styles.userTypeButton,
+              ...(selectedUserType === 'trabajador' ? styles.userTypeButtonActive : {})
+            }}
+            onClick={() => handleUserTypeSelect('trabajador')}
+          >
+            <User size={24} />
+            <span>Trabajador</span>
+          </div>
+          
+          <div
+            style={{
+              ...styles.userTypeButton,
+              ...(selectedUserType === 'administrador' ? styles.userTypeButtonActive : {})
+            }}
+            onClick={() => handleUserTypeSelect('administrador')}
+          >
+            <Shield size={24} />
+            <span>Administrador</span>
+          </div>
         </div>
 
-        {/* Información de usuarios de prueba */}
-        {/* <div className="test-users-info">
-          <p className="test-users-title">Usuarios de prueba:</p>
-          <p><strong>Trabajador:</strong> trabajador01 / worker123</p>
-          <p><strong>Admin:</strong> admin01 / admin456</p>
-        </div> */}
-
-        <div className="login-form">
-          {/* Selector de tipo de usuario */}
-          <div className="form-group">
-            <label className="form-label">
-              Tipo de Usuario
-            </label>
-            <div className="user-type-selector">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="userType"
-                  value="worker"
-                  checked={formData.userType === 'worker'}
-                  onChange={handleInputChange}
-                  className="radio-input"
-                />
-                <span className="radio-label">Trabajador</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="userType"
-                  value="admin"
-                  checked={formData.userType === 'admin'}
-                  onChange={handleInputChange}
-                  className="radio-input"
-                />
-                <span className="radio-label">Administrador</span>
-              </label>
+        <div>
+          <div style={styles.formGroup}>
+            <div style={styles.label}>
+              <Mail size={16} style={{ display: 'inline', marginRight: '8px' }} />
+              Correo Electrónico
             </div>
-          </div>
-
-          {/* Campo de usuario */}
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Nombre de Usuario
-            </label>
             <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              type="email"
+              name="email"
+              value={credentials.email}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              className={`form-input ${errors.username ? 'error' : ''}`}
-              placeholder="Ingresa tu usuario"
+              onFocus={() => setFocusedInput('email')}
+              onBlur={() => setFocusedInput('')}
+              style={{
+                ...styles.input,
+                ...(focusedInput === 'email' ? styles.inputFocus : {})
+              }}
+              placeholder="tu@email.com"
             />
-            {errors.username && (
-              <p className="error-message">{errors.username}</p>
-            )}
           </div>
 
-          {/* Campo de contraseña */}
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
+          <div style={styles.formGroup}>
+            <div style={styles.label}>
+              <Lock size={16} style={{ display: 'inline', marginRight: '8px' }} />
               Contraseña
-            </label>
+            </div>
             <input
               type="password"
-              id="password"
               name="password"
-              value={formData.password}
+              value={credentials.password}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              className={`form-input ${errors.password ? 'error' : ''}`}
-              placeholder="Ingresa tu contraseña"
+              onFocus={() => setFocusedInput('password')}
+              onBlur={() => setFocusedInput('')}
+              style={{
+                ...styles.input,
+                ...(focusedInput === 'password' ? styles.inputFocus : {})
+              }}
+              placeholder="••••••••"
             />
-            {errors.password && (
-              <p className="error-message">{errors.password}</p>
-            )}
           </div>
 
-          {/* Error general */}
-          {errors.general && (
-            <div className="general-error">
-              {errors.general}
+          <button
+            onClick={handleLogin}
+            style={styles.loginButton}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            Iniciar Sesión
+          </button>
+
+          {error && (
+            <div style={styles.errorMessage}>
+              {error}
             </div>
           )}
-
-          {/* Botón de envío */}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="submit-button"
-          >
-            {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-          </button>
         </div>
       </div>
     </div>
   );
-};
-
-// Componente principal que maneja el estado de autenticación
-const Login = () => {
-  const [user, setUser] = useState(null);
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
-
-  // Renderizar componente según el estado de autenticación
-  if (!user) {
-    return <LoginComponent onLogin={handleLogin} />;
-  }
-
-  // Redireccionar según el tipo de usuario
-  if (user.type === 'admin') {
-    return <Usuario user={user} onLogout={handleLogout} />;
-  } else {
-    return <Dashboard user={user} onLogout={handleLogout} />;
-  }
 };
 
 export default Login;
