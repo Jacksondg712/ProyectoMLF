@@ -1,12 +1,14 @@
 import React from 'react';
 import Login from './components/login/login'
+import Usuario from './components/usuario/usuario'
+
 
 function App() {
   return (
     <>
       <section>
         <div>
-          <Login />
+          <Usuario />
         </div>
       </section>
     </>
